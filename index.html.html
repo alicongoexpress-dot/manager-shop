@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShopManager Pro</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f4f5f7; --bg2: #ffffff; --bg3: #f0f1f3; --border: #e2e4e8;
+    --text: #1a1d23; --text2: #6b7280; --text3: #9ca3af;
+    --purple: #534AB7; --purple-light: #EEEDFE; --purple-dark: #3C3489;
+    --green: #1D9E75; --green-light: #E1F5EE;
+    --orange: #D97706; --orange-light: #FEF3C7;
+    --blue: #2563EB; --blue-light: #EFF6FF;
+    --red: #DC2626; --red-light: #FEE2E2;
+    --radius: 8px; --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); font-size: 14px; min-height: 100vh; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); height: 54px; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; box-shadow: var(--shadow); }
+  .topbar-logo { font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+  .topbar-logo span { color: var(--purple); }
+  .topbar-user { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: var(--purple-light); color: var(--purple-dark); }
+  .role-bar { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 8px 1.5rem; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .role-bar span { font-size: 12px; color: var(--text2); }
+  .nav { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 1.5rem; display: flex; gap: 2px; overflow-x: auto; }
+  .nav-btn { padding: 12px 16px; font-size: 13px; font-weight: 500; border: none; background: none; cursor: pointer; color: var(--text2); border-bottom: 2px solid transparent; white-space: nowrap; }
+  .nav-btn:hover { color: var(--text); }
+  .nav-btn.active { color: var(--purple); border-bottom-color: var(--purple); }
+  .main { padding: 1.5rem; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 1.5rem; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 1.25rem; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr;}.grid-2{grid-template-columns:1fr;}}
+  @media(max-width:600px){.grid-4,.grid-3{grid-template-columns:1fr 1fr;}.product-grid{grid-template-columns:1fr !important;}}
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.25rem; margin-bottom: 1rem; box-shadow: var(--shadow); }
+  .card-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+  .metric { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1rem; box-shadow: var(--shadow); }
+  .metric-label { font-size: 12px; color: var(--text2); margin-bottom: 6px; display: flex; align-items: center; gap: 5px; }
+  .metric-val { font-size: 24px; font-weight: 700; color: var(--text); line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 600; }
+  .badge-success { background: var(--green-light); color: var(--green); }
+  .badge-warning { background: var(--orange-light); color: var(--orange); }
+  .badge-info { background: var(--blue-light); color: var(--blue); }
+  .badge-purple { background: var(--purple-light); color: var(--purple-dark); }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg2); font-size: 13px; font-weight: 500; cursor: pointer; color: var(--text); transition: background .1s; box-shadow: var(--shadow); }
+  .btn:hover { background: var(--bg3); }
+  .btn-primary { background: var(--purple); color: white; border-color: var(--purple); }
+  .btn-primary:hover { background: var(--purple-dark); }
+  .btn-green { background: var(--green); color: white; border-color: var(--green); }
+  .btn-green:hover { background: #157a5a; }
+  .btn-sm { padding: 5px 11px; font-size: 12px; }
+  .input { width: 100%; padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 13px; background: var(--bg2); color: var(--text); outline: none; transition: border-color .15s, box-shadow .15s; }
+  .input:focus { border-color: var(--purple); box-shadow: 0 0 0 3px rgba(83,74,183,.12); }
+  select.input { cursor: pointer; }
+  .form-group { margin-bottom: 14px; }
+  .form-label { font-size: 12px; font-weight: 600; color: var(--text2); margin-bottom: 5px; display: block; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; white-space: nowrap; }
+  thead th { text-align: left; color: var(--text2); font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; padding: 10px 12px; border-bottom: 1px solid var(--border); background: var(--bg3); }
+  tbody td { padding: 11px 12px; border-bottom: 1px solid var(--border); }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: var(--bg3); }
+  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 8px; }
+  .section-title { font-size: 16px; font-weight: 700; }
+  .product-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+  .product-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem; box-shadow: var(--shadow); }
+  .timeline { position: relative; padding-left: 26px; }
+  .timeline::before { content:''; position: absolute; left: 9px; top: 10px; bottom: 10px; width: 1px; background: var(--border); }
+  .timeline-item { position: relative; margin-bottom: 20px; }
+  .timeline-item:last-child { margin-bottom: 0; }
+  .tl-dot { position: absolute; left: -21px; top: 3px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid; }
+  .tl-done { border-color: var(--green); background: var(--green); }
+  .tl-active { border-color: var(--purple); background: var(--purple); }
+  .tl-wait { border-color: var(--border); background: var(--bg2); }
+  .tl-title { font-size: 13px; font-weight: 600; }
+  .tl-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 200; align-items: center; justify-content: center; padding: 1rem; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--bg2); border-radius: var(--radius-lg); padding: 1.5rem; width: 520px; max-width: 100%; border: 1px solid var(--border); box-shadow: 0 20px 60px rgba(0,0,0,.2); max-height: 90vh; overflow-y: auto; }
+  .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center; }
+  .close-btn { background: none; border: none; cursor: pointer; color: var(--text2); font-size: 20px; line-height: 1; }
+  .banner { border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; font-size: 13px; display: flex; align-items: flex-start; gap: 8px; border: 1px solid; }
+  .banner-purple { background: var(--purple-light); border-color: #afa9ec; color: var(--purple-dark); }
+  .banner-warn { background: var(--orange-light); border-color: #fcd34d; color: #92400e; }
+  .banner-green { background: var(--green-light); border-color: #6ee7c7; color: #064e3b; }
+  .big-points { font-size: 80px; font-weight: 800; color: var(--purple); line-height: 1; }
+  .big-label { font-size: 14px; color: var(--text2); margin-top: 6px; }
+  .stat-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .stat-row:last-child { border-bottom: none; }
+  .momo-box { background: linear-gradient(135deg,var(--purple-light),#e0deff); border: 1px solid #c4bef8; border-radius: var(--radius-lg); padding: 1.25rem; text-align: center; margin: 12px 0; }
+  .momo-number { font-size: 28px; font-weight: 800; color: var(--purple); letter-spacing: .04em; margin: 8px 0; }
+  .momo-label { font-size: 12px; color: var(--text2); }
+  .points-badge { background: var(--purple); color: white; border-radius: 20px; padding: 4px 14px; font-size: 13px; font-weight: 700; }
+  .agent-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.5rem; margin-bottom: 1rem; box-shadow: var(--shadow); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; }
+  .empty { text-align: center; padding: 3rem 1rem; color: var(--text2); }
+  .empty i { font-size: 40px; display: block; margin-bottom: 12px; color: var(--text3); }
+  .page-narrow { max-width: 580px; margin: 0 auto; }
+
+  /* FRAIS TOGGLE */
+  .frais-toggle { display: flex; gap: 8px; margin-top: 10px; }
+  .toggle-btn { flex: 1; padding: 10px; border: 2px solid var(--border); border-radius: var(--radius); background: var(--bg3); font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; transition: all .15s; }
+  .toggle-btn.active-oui { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .toggle-btn.active-non { border-color: var(--orange); background: var(--orange-light); color: var(--orange); }
+
+  /* PHOTO UPLOAD */
+  .photo-zone { border: 2px dashed var(--border); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; margin-top: 12px; }
+  .photo-zone:hover { border-color: var(--purple); background: var(--purple-light); }
+  .photo-zone input[type=file] { display: none; }
+  .photo-preview { width: 100%; max-height: 220px; object-fit: cover; border-radius: var(--radius); margin-top: 10px; display: none; }
+  .req-star { color: var(--red); margin-left: 3px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <i class="ti ti-shopping-bag" style="color:var(--purple);font-size:22px"></i>
+    Shop<span>Manager</span> Pro
+  </div>
+  <div class="topbar-user">
+    <span id="role-pill" style="font-size:12px;background:var(--purple-light);color:var(--purple-dark);padding:3px 12px;border-radius:20px;font-weight:600;">Admin</span>
+    <div class="avatar" id="av">AD</div>
+    <span id="username-display" style="font-weight:600;">Admin</span>
+  </div>
+</div>
+
+<div class="role-bar">
+  <span>Voir en tant que :</span>
+  <button class="btn btn-sm btn-primary" onclick="switchRole('admin')"><i class="ti ti-shield"></i> Admin</button>
+  <button class="btn btn-sm" onclick="switchRole('agent')"><i class="ti ti-user"></i> Agent (Jean K.)</button>
+  <button class="btn btn-sm" onclick="switchRole('livreur')"><i class="ti ti-motorbike"></i> Livreur (Paul D.)</button>
+</div>
+
+<div class="nav" id="main-nav"></div>
+<div class="main" id="main-content"></div>
+
+<div class="modal-overlay" id="modal-overlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modal-content"></div>
+</div>
+
+<script>
+/* ══════════════════════════ STATE ══════════════════════════ */
+const S = {
+  role: 'admin',
+  momoNumber: '06 00 11 22 33',
+  agenceLivraison: 'MTN Mobile Money Agence Centre-Ville',
+  products: [
+    { id:1, name:'Casque Bluetooth', price:5000,  stock:12, cat:'Électronique', emoji:'🎧', desc:'Casque sans fil, réduction de bruit, autonomie 20h' },
+    { id:2, name:'Smartphone X12',   price:85000, stock:5,  cat:'Électronique', emoji:'📱', desc:'Écran 6.5", 128Go, double SIM, 4G' },
+    { id:3, name:'Chargeur solaire', price:15000, stock:20, cat:'Accessoires',  emoji:'🔋', desc:'Panneau solaire portable 20W, 2 ports USB' },
+    { id:4, name:'Montre connectée', price:25000, stock:8,  cat:'Accessoires',  emoji:'⌚', desc:'Suivi santé, notifications, GPS intégré' },
+    { id:5, name:'Écouteurs TWS',    price:8000,  stock:30, cat:'Électronique', emoji:'🎵', desc:'True Wireless, IP54, 6h autonomie' },
+    { id:6, name:'Câble USB-C x3',   price:3500,  stock:50, cat:'Accessoires',  emoji:'🔌', desc:'Pack 3 câbles nylon tressé 1.2m' }
+  ],
+  orders: [
+    { id:'CMD-001', agent:'Jean K.', client:'Marie L.',      phone:'06 11 22 33', product:'Casque Bluetooth', qty:1, amount:5000,  status:'livré',       date:'10/06/2025', pay:'MTN MoMo',  livreur:'Paul D.', frais:1500, fraisMode:'oui', photoUrl:null },
+    { id:'CMD-002', agent:'Jean K.', client:'Amos N.',       phone:'06 44 55 66', product:'Écouteurs TWS',    qty:2, amount:16000, status:'en_livraison', date:'13/06/2025', pay:'-',         livreur:'Paul D.', frais:0,    fraisMode:null,  photoUrl:null },
+    { id:'CMD-003', agent:'Sophie M.', client:'Christelle', phone:'06 77 88 99', product:'Smartphone X12',   qty:1, amount:85000, status:'confirmé',     date:'14/06/2025', pay:'-',         livreur:'-',       frais:0,    fraisMode:null,  photoUrl:null },
+    { id:'CMD-004', agent:'Jean K.', client:'Fabrice T.',   phone:'06 33 44 55', product:'Montre connectée', qty:3, amount:75000, status:'en_attente',   date:'15/06/2025', pay:'-',         livreur:'-',       frais:0,    fraisMode:null,  photoUrl:null }
+  ],
+  agents: [
+    { id:1, name:'Jean K.',   email:'jean@shop.com',   points:3, sales:3, status:'actif' },
+    { id:2, name:'Sophie M.', email:'sophie@shop.com', points:1, sales:1, status:'actif' }
+  ]
+};
+
+const NAVS = {
+  admin:   ['dashboard','produits','commandes','agents','livraisons','parametres'],
+  agent:   ['mon_compte','produits','nouvelle_commande'],
+  livreur: ['mes_livraisons']
+};
+const NAV_LABELS = {
+  dashboard:'Tableau de bord', produits:'Produits', commandes:'Commandes',
+  agents:'Agents', livraisons:'Livraisons', mon_compte:'Mon compte',
+  nouvelle_commande:'Nouvelle commande', mes_livraisons:'Mes livraisons', parametres:'Paramètres'
+};
+
+let page = 'dashboard';
+
+/* ══════════════════════════ CORE ══════════════════════════ */
+function switchRole(r) {
+  S.role = r;
+  const L = {admin:'Admin', agent:'Agent (Jean K.)', livreur:'Livreur (Paul D.)'};
+  const I = {admin:'AD', agent:'JK', livreur:'PD'};
+  document.getElementById('role-pill').textContent = L[r];
+  document.getElementById('username-display').textContent = L[r];
+  document.getElementById('av').textContent = I[r];
+  page = NAVS[r][0];
+  render();
+}
+function nav(p) { page = p; render(); }
+function render() {
+  document.getElementById('main-nav').innerHTML = NAVS[S.role].map(p =>
+    `<button class="nav-btn${p===page?' active':''}" onclick="nav('${p}')">${NAV_LABELS[p]}</button>`
+  ).join('');
+  const map = { dashboard:pgDashboard, produits:pgProduits, commandes:pgCommandes, agents:pgAgents,
+    livraisons:pgLivraisons, mon_compte:pgMonCompte, nouvelle_commande:pgNouvelleCommande,
+    mes_livraisons:pgMesLivraisons, parametres:pgParametres };
+  document.getElementById('main-content').innerHTML = (map[page]||(() => ''))();
+}
+function sbadge(s) {
+  return { livré:'<span class="badge badge-success"><i class="ti ti-check"></i> Livré</span>',
+    en_livraison:'<span class="badge badge-info"><i class="ti ti-motorbike"></i> En livraison</span>',
+    confirmé:'<span class="badge badge-purple"><i class="ti ti-check"></i> Confirmé</span>',
+    en_attente:'<span class="badge badge-warning"><i class="ti ti-clock"></i> En attente</span>'}[s]||s;
+}
+function fmt(n) { return Number(n).toLocaleString('fr-FR'); }
+function today() { return new Date().toLocaleDateString('fr-FR'); }
+function modal(h) { document.getElementById('modal-content').innerHTML = h; document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+
+/* ══════════════════════════ PAGES ══════════════════════════ */
+
+function pgDashboard() {
+  const ventes = S.orders.filter(o=>o.status==='livré').reduce((a,o)=>a+o.amount,0);
+  const enLiv  = S.orders.filter(o=>o.status==='en_livraison').length;
+  return `
+  <div class="grid-4">
+    <div class="metric"><div class="metric-label"><i class="ti ti-chart-line"></i> Chiffre d'affaires</div><div class="metric-val">${fmt(ventes)} F</div><div class="metric-sub">Sur commandes livrées</div></div>
+    <div class="metric"><div class="metric-label"><i class="ti ti-package"></i> Commandes totales</div><div class="metric-val">${S.orders.length}</div></div>
+    <div class="metric"><div class="metric-label"><i class="ti ti-motorbike"></i> En livraison</div><div class="metric-val">${enLiv}</div></div>
+    <div class="metric"><div class="metric-label"><i class="ti ti-users"></i> Agents actifs</div><div class="metric-val">${S.agents.length}</div></div>
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Dernières commandes <button class="btn btn-sm" onclick="nav('commandes')">Voir tout</button></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Agent</th><th>Produit</th><th>Qté</th><th>Total</th><th>Statut</th></tr></thead>
+        <tbody>${S.orders.slice(0,4).map(o=>`<tr>
+          <td style="font-family:monospace;font-size:11px;color:var(--text2)">${o.id}</td>
+          <td><strong>${o.agent}</strong></td><td>${o.product}</td>
+          <td style="text-align:center">${o.qty}</td>
+          <td><strong>${fmt(o.amount)} F</strong></td><td>${sbadge(o.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-trophy" style="color:#f59e0b"></i> Classement agents</div>
+      ${S.agents.map((a,i)=>`
+      <div class="stat-row">
+        <div style="display:flex;align-items:center;gap:12px">
+          <span style="font-size:20px">${['🥇','🥈','🥉'][i]||'·'}</span>
+          <div><div style="font-weight:600">${a.name}</div><div style="font-size:11px;color:var(--text2)">${a.sales} vente${a.sales>1?'s':''}</div></div>
+        </div>
+        <div class="points-badge">${a.points} pts</div>
+      </div>`).join('')}
+    </div>
+  </div>`;
+}
+
+function pgProduits() {
+  const isAdmin = S.role==='admin';
+  return `
+  <div class="section-header">
+    <div class="section-title"><i class="ti ti-box"></i> Catalogue (${S.products.length})</div>
+    ${isAdmin?`<button class="btn btn-primary" onclick="openAddProd()"><i class="ti ti-plus"></i> Ajouter produit</button>`:''}
+  </div>
+  <div class="banner banner-purple"><i class="ti ti-info-circle"></i> <span>1 vente confirmée = <strong>1 point</strong> pour l'agent.</span></div>
+  <div class="product-grid">
+  ${S.products.map(p=>`
+    <div class="product-card">
+      <div style="font-size:30px;margin-bottom:10px">${p.emoji}</div>
+      <div style="font-weight:700;font-size:14px;margin-bottom:3px">${p.name}</div>
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px">${p.cat}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">${p.desc}</div>
+      <div style="font-size:16px;font-weight:800;color:var(--purple);margin-bottom:4px">${fmt(p.price)} F CFA</div>
+      <div style="font-size:11px;color:var(--text3)"><i class="ti ti-package"></i> Stock : ${p.stock}</div>
+      ${S.role==='agent'?`<button class="btn btn-primary btn-sm" style="margin-top:10px;width:100%" onclick="openNewOrder(${p.id})"><i class="ti ti-shopping-cart"></i> Commander</button>`:''}
+      ${isAdmin?`<div style="display:flex;gap:6px;margin-top:10px">
+        <button class="btn btn-sm" onclick="openEditProd(${p.id})" style="flex:1"><i class="ti ti-edit"></i> Éditer</button>
+        <button class="btn btn-sm" onclick="delProd(${p.id})" style="color:var(--red)"><i class="ti ti-trash"></i></button>
+      </div>`:''}
+    </div>`).join('')}
+  </div>`;
+}
+
+function pgCommandes() {
+  return `
+  <div class="section-header">
+    <div class="section-title">Commandes</div>
+    <select class="input" style="width:170px" onchange="filterCmds(this.value)">
+      <option value="">Tous les statuts</option>
+      <option value="en_attente">En attente</option>
+      <option value="confirmé">Confirmé</option>
+      <option value="en_livraison">En livraison</option>
+      <option value="livré">Livré</option>
+    </select>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="table-wrap" id="cmds-table">${cmdsTable(S.orders)}</div>
+  </div>`;
+}
+function cmdsTable(orders) {
+  if(!orders.length) return '<div class="empty"><i class="ti ti-inbox"></i>Aucune commande</div>';
+  return `<table>
+    <thead><tr><th>ID</th><th>Date</th><th>Agent</th><th>Client</th><th>Produit</th><th>Qté</th><th>Total</th><th>Paiement</th><th>Livreur</th><th>Statut</th><th></th></tr></thead>
+    <tbody>${orders.map(o=>`<tr>
+      <td style="font-family:monospace;font-size:11px;color:var(--text2)">${o.id}</td>
+      <td style="color:var(--text2)">${o.date}</td>
+      <td><strong>${o.agent}</strong></td><td>${o.client}</td><td>${o.product}</td>
+      <td style="text-align:center;font-weight:600">${o.qty}</td>
+      <td><strong>${fmt(o.amount)} F</strong></td>
+      <td style="font-size:12px">${o.pay}</td>
+      <td style="font-size:12px">${o.livreur}</td>
+      <td>${sbadge(o.status)}</td>
+      <td>${o.status==='confirmé'?`<button class="btn btn-sm" onclick="openAssign('${o.id}')"><i class="ti ti-motorbike"></i> Assigner</button>`:''}</td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+function filterCmds(v) {
+  const list = v ? S.orders.filter(o=>o.status===v) : S.orders;
+  document.getElementById('cmds-table').innerHTML = cmdsTable(list);
+}
+
+function pgAgents() {
+  return `
+  <div class="section-header">
+    <div class="section-title">Agents (${S.agents.length})</div>
+    <button class="btn btn-primary" onclick="openAddAgent()"><i class="ti ti-user-plus"></i> Ajouter agent</button>
+  </div>
+  ${S.agents.map(a=>`
+  <div class="agent-card">
+    <div style="display:flex;align-items:center;gap:14px">
+      <div class="avatar" style="width:46px;height:46px;font-size:16px;font-weight:700">${a.name.split(' ').map(n=>n[0]).join('')}</div>
+      <div>
+        <div style="font-weight:700;font-size:15px">${a.name}</div>
+        <div style="font-size:12px;color:var(--text2)">${a.email}</div>
+        <span class="badge badge-success" style="margin-top:4px">${a.status}</span>
+      </div>
+    </div>
+    <div style="display:flex;gap:2.5rem;text-align:center">
+      <div><div style="font-size:32px;font-weight:800;color:var(--purple)">${a.points}</div><div style="font-size:12px;color:var(--text2)">points</div></div>
+      <div><div style="font-size:24px;font-weight:700">${a.sales}</div><div style="font-size:12px;color:var(--text2)">ventes</div></div>
+    </div>
+    <button class="btn btn-sm" onclick="openAgentDetail(${a.id})"><i class="ti ti-eye"></i> Détails</button>
+  </div>`).join('')}`;
+}
+
+function pgLivraisons() {
+  const liv = S.orders.filter(o=>o.status==='en_livraison');
+  return `
+  <div class="section-header"><div class="section-title">Suivi livraisons</div></div>
+  <div class="banner banner-warn"><i class="ti ti-alert-triangle"></i> Le client paie par Mobile Money. Le livreur récupère ses frais séparément (espèces ou agence).</div>
+  <div class="grid-3">
+    <div class="metric"><div class="metric-label">En cours</div><div class="metric-val">${liv.length}</div></div>
+    <div class="metric"><div class="metric-label">Livrées</div><div class="metric-val">${S.orders.filter(o=>o.status==='livré').length}</div></div>
+    <div class="metric"><div class="metric-label">À assigner</div><div class="metric-val">${S.orders.filter(o=>o.status==='confirmé').length}</div></div>
+  </div>
+  ${liv.length===0?`<div class="empty"><i class="ti ti-circle-check" style="color:var(--green)"></i>Aucune livraison en cours</div>`:''}
+  ${liv.map(o=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">
+      <div>
+        <div style="font-weight:700;font-size:15px">${o.product} <span style="font-size:13px;color:var(--text2)">× ${o.qty}</span></div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px"><i class="ti ti-user"></i> ${o.client} — <i class="ti ti-phone"></i> ${o.phone}</div>
+        <div style="margin-top:6px">${sbadge(o.status)}</div>
+      </div>
+    </div>
+    <div class="timeline" style="margin-top:14px">
+      <div class="timeline-item"><div class="tl-dot tl-done"></div><div class="tl-title">Commandé par ${o.agent}</div></div>
+      <div class="timeline-item"><div class="tl-dot tl-active"></div><div class="tl-title">En livraison</div></div>
+      <div class="timeline-item"><div class="tl-dot tl-wait"></div><div class="tl-title">Client paie par Mobile Money → confirmation auto</div></div>
+    </div>
+  </div>`).join('')}`;
+}
+
+/* ══════ MON COMPTE (AGENT) ══════ */
+function pgMonCompte() {
+  const ag = S.agents[0];
+  const mes = S.orders.filter(o=>o.agent===ag.name);
+  const livrees = mes.filter(o=>o.status==='livré').length;
+  return `
+  <div class="page-narrow">
+    <div class="card" style="text-align:center;padding:2.5rem 1.5rem">
+      <div style="font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Mes points</div>
+      <div class="big-points">${ag.points}</div>
+      <div class="big-label">point${ag.points>1?'s':''} accumulé${ag.points>1?'s':''}</div>
+      <div style="margin-top:14px;display:inline-block;background:var(--purple-light);color:var(--purple-dark);padding:5px 18px;border-radius:20px;font-size:12px;font-weight:600">1 point = 1 vente confirmée</div>
+    </div>
+    <div class="grid-2" style="margin-bottom:1rem">
+      <div class="metric" style="text-align:center"><div style="font-size:40px;font-weight:800">${ag.sales}</div><div class="metric-label" style="justify-content:center">Ventes totales</div></div>
+      <div class="metric" style="text-align:center"><div style="font-size:40px;font-weight:800;color:var(--green)">${livrees}</div><div class="metric-label" style="justify-content:center">Livrées avec succès</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Mes commandes</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ID</th><th>Client</th><th>Produit</th><th>Qté</th><th>Date</th><th>Statut</th></tr></thead>
+        <tbody>${mes.map(o=>`<tr>
+          <td style="font-family:monospace;font-size:11px;color:var(--text2)">${o.id}</td>
+          <td>${o.client}</td><td>${o.product}</td>
+          <td style="text-align:center;font-weight:600">${o.qty}</td>
+          <td style="color:var(--text2)">${o.date}</td>
+          <td>${sbadge(o.status)}</td>
+        </tr>`).join('')}</tbody>
+      </table></div>
+    </div>
+  </div>`;
+}
+
+/* ══════ NOUVELLE COMMANDE (AGENT) ══════ */
+function pgNouvelleCommande() {
+  return `
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-user"></i> Infos client & commande</div>
+      <div class="form-group"><label class="form-label">Nom du client</label><input class="input" id="c-name" placeholder="Ex : Marie Loubota"></div>
+      <div class="form-group"><label class="form-label">Téléphone</label><input class="input" id="c-phone" placeholder="06 XX XX XX XX"></div>
+      <div class="form-group"><label class="form-label">Adresse de livraison</label><input class="input" id="c-addr" placeholder="Quartier, rue..."></div>
+      <div class="form-group"><label class="form-label">Produit</label>
+        <select class="input" id="c-prod" onchange="updateQtyMax()">
+          ${S.products.map(p=>`<option value="${p.id}" data-stock="${p.stock}" data-price="${p.price}">${p.emoji} ${p.name} — ${fmt(p.price)} F</option>`).join('')}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Quantité <span class="req-star">*</span> <span id="stock-info" style="font-weight:400;color:var(--text3);font-size:11px"></span></label>
+        <input class="input" id="c-qty" type="number" min="1" placeholder="Obligatoire" oninput="updateTotal()">
+        <div id="qty-error" style="font-size:12px;color:var(--red);margin-top:4px;display:none"><i class="ti ti-alert-circle"></i> La quantité est obligatoire et doit être ≥ 1</div>
+      </div>
+      <div class="form-group" style="background:var(--purple-light);border-radius:var(--radius);padding:12px">
+        <label class="form-label" style="color:var(--purple-dark)">Total estimé</label>
+        <div id="total-display" style="font-size:22px;font-weight:800;color:var(--purple)">— F CFA</div>
+      </div>
+      <div class="form-group"><label class="form-label">Notes</label><input class="input" id="c-notes" placeholder="Infos supplémentaires..."></div>
+      <button class="btn btn-primary" style="width:100%" onclick="submitOrder()"><i class="ti ti-check"></i> Confirmer la commande</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-route"></i> Comment ça marche</div>
+      <div class="timeline">
+        <div class="timeline-item"><div class="tl-dot tl-active"></div><div class="tl-title">Vous passez la commande</div><div class="tl-sub">Quantité obligatoire à renseigner</div></div>
+        <div class="timeline-item"><div class="tl-dot tl-wait"></div><div class="tl-title">L'admin assigne un livreur</div></div>
+        <div class="timeline-item"><div class="tl-dot tl-wait"></div><div class="tl-title">Livraison chez le client</div><div class="tl-sub">Le livreur ne touche pas l'argent du client</div></div>
+        <div class="timeline-item"><div class="tl-dot tl-wait"></div><div class="tl-title">Client paie par Mobile Money</div><div class="tl-sub">La livraison est confirmée automatiquement</div></div>
+        <div class="timeline-item"><div class="tl-dot tl-wait"></div><div class="tl-title">+1 point crédité sur votre compte</div></div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function updateQtyMax() {
+  const sel = document.getElementById('c-prod');
+  const opt = sel.options[sel.selectedIndex];
+  const stock = opt.getAttribute('data-stock');
+  document.getElementById('stock-info').textContent = `(stock disponible : ${stock})`;
+  document.getElementById('c-qty').max = stock;
+  updateTotal();
+}
+function updateTotal() {
+  const sel = document.getElementById('c-prod');
+  const opt = sel ? sel.options[sel.selectedIndex] : null;
+  const price = opt ? parseInt(opt.getAttribute('data-price')) : 0;
+  const qty = parseInt(document.getElementById('c-qty').value) || 0;
+  const el = document.getElementById('total-display');
+  if(el) el.textContent = qty > 0 ? fmt(price * qty) + ' F CFA' : '— F CFA';
+}
+
+/* ══════ MES LIVRAISONS (LIVREUR) ══════ */
+function pgMesLivraisons() {
+  const liv = S.orders.filter(o=>o.status==='en_livraison' && o.livreur==='Paul D.');
+  const done = S.orders.filter(o=>o.status==='livré' && o.livreur==='Paul D.');
+  const fraisGagnes = done.reduce((a,o)=>a+(o.fraisMode==='oui'?o.frais:0),0);
+  return `
+  <div class="section-header"><div class="section-title">Mes livraisons</div></div>
+
+  <div class="grid-3" style="margin-bottom:1.25rem">
+    <div class="metric" style="text-align:center">
+      <div style="font-size:36px;font-weight:800;color:var(--purple)">${liv.length}</div>
+      <div class="metric-label" style="justify-content:center"><i class="ti ti-motorbike"></i> Commandes en cours</div>
+    </div>
+    <div class="metric" style="text-align:center">
+      <div style="font-size:36px;font-weight:800;color:var(--green)">${done.length}</div>
+      <div class="metric-label" style="justify-content:center"><i class="ti ti-circle-check"></i> Livraisons effectuées</div>
+    </div>
+    <div class="metric" style="text-align:center">
+      <div style="font-size:28px;font-weight:800;color:var(--orange)">${fmt(fraisGagnes)} F</div>
+      <div class="metric-label" style="justify-content:center"><i class="ti ti-coin"></i> Frais gagnés (MoMo)</div>
+    </div>
+  </div>
+
+  <!-- ZONE RETRAIT FRAIS -->
+  <div class="card" style="border:2px solid var(--orange);background:linear-gradient(135deg,#fffbf0,#fff);margin-bottom:1.25rem">
+    <div class="card-title" style="color:var(--orange)"><span><i class="ti ti-cash"></i> Comment retirer vos frais</span></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div style="background:var(--orange-light);border-radius:var(--radius);padding:12px;display:flex;gap:10px;align-items:flex-start">
+        <div style="width:30px;height:30px;background:var(--orange);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-building-bank" style="color:white;font-size:14px"></i></div>
+        <div><div style="font-weight:700;font-size:13px">À l'agence</div><div style="font-size:12px;color:var(--text2);margin-top:2px">${S.agenceLivraison}</div></div>
+      </div>
+      <div style="background:var(--green-light);border-radius:var(--radius);padding:12px;display:flex;gap:10px;align-items:flex-start">
+        <div style="width:30px;height:30px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-cash" style="color:white;font-size:14px"></i></div>
+        <div><div style="font-weight:700;font-size:13px">En espèces</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Contactez l'admin pour convenir d'un point de retrait</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="banner banner-warn"><i class="ti ti-alert-triangle"></i> <strong>Ne jamais encaisser l'argent du client.</strong> Le client paie par Mobile Money. Vos frais de livraison sont gérés séparément.</div>
+
+  ${liv.length===0?`<div class="empty"><i class="ti ti-package-off"></i>Aucune livraison assignée pour le moment</div>`:''}
+
+  ${liv.map(o=>`
+  <div class="card" id="card-${o.id}">
+    <!-- EN-TÊTE -->
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div>
+        <div style="font-weight:700;font-size:15px">${o.product} <span style="font-size:13px;color:var(--text2);font-weight:400">× ${o.qty}</span></div>
+        <div style="font-size:13px;color:var(--text2);margin-top:4px"><i class="ti ti-user"></i> <strong>${o.client}</strong> &nbsp;|&nbsp; <i class="ti ti-phone"></i> ${o.phone}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">${o.id} · Agent : ${o.agent}</div>
+      </div>
+      <div>${sbadge(o.status)}</div>
+    </div>
+
+    <!-- FRAIS DE LIVRAISON VARIABLES -->
+    <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;background:var(--bg3)">
+      <div style="font-size:13px;font-weight:700;margin-bottom:8px"><i class="ti ti-motorbike" style="color:var(--orange)"></i> Frais de livraison</div>
+      <div class="form-row" style="margin-bottom:10px">
+        <div>
+          <label class="form-label">Montant des frais (F CFA)</label>
+          <input class="input" type="number" id="frais-${o.id}" placeholder="Ex: 1500" min="0" oninput="recalcTotal('${o.id}')">
+        </div>
+        <div>
+          <label class="form-label">Distance estimée</label>
+          <input class="input" type="text" id="dist-${o.id}" placeholder="Ex: 5 km">
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">Les frais sont-ils inclus dans le paiement Mobile Money ?</div>
+      <div class="frais-toggle">
+        <button class="toggle-btn" id="btn-oui-${o.id}" onclick="setFraisMode('${o.id}','oui')">
+          ✅ OUI — Le client paie tout (produit + frais) par Mobile Money
+        </button>
+        <button class="toggle-btn" id="btn-non-${o.id}" onclick="setFraisMode('${o.id}','non')">
+          💵 NON — Je récupère les frais en espèces sur place
+        </button>
+      </div>
+      <div id="frais-info-${o.id}" style="margin-top:8px;font-size:12px;color:var(--text2);display:none"></div>
+    </div>
+
+    <!-- MOMO BOX -->
+    <div class="momo-box" id="momo-${o.id}">
+      <div class="momo-label">Le client paie par Mobile Money au numéro</div>
+      <div class="momo-number">${S.momoNumber}</div>
+      <div style="font-size:13px;color:var(--text2)">Montant produit</div>
+      <div style="font-size:20px;font-weight:800;color:var(--text);margin:4px 0">${fmt(o.amount)} F CFA</div>
+      <div id="frais-line-${o.id}" style="display:none;font-size:13px;color:var(--orange);margin-top:4px"></div>
+      <div id="total-line-${o.id}" style="margin-top:8px;padding-top:8px;border-top:1px solid #c4bef8;font-size:18px;font-weight:800;color:var(--purple)"></div>
+      <div class="momo-label" style="margin-top:6px">Le paiement confirme automatiquement la livraison.</div>
+    </div>
+
+    <!-- PHOTO CONFIRMATION -->
+    <div style="border:1px solid var(--border);border-radius:var(--radius);padding:12px;margin-bottom:12px;background:var(--bg3)">
+      <div style="font-size:13px;font-weight:700;margin-bottom:6px"><i class="ti ti-camera" style="color:var(--purple)"></i> Confirmation par photo <span class="req-star">*</span></div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px">Prenez une photo de la livraison avec votre téléphone pour confirmer la remise au client.</div>
+      <label class="photo-zone" for="photo-${o.id}" onclick="triggerPhoto('${o.id}')">
+        <input type="file" accept="image/*" capture="environment" id="photo-${o.id}" onchange="previewPhoto('${o.id}',this)">
+        <i class="ti ti-camera-plus" style="font-size:36px;color:var(--purple);margin-bottom:8px;display:block"></i>
+        <div style="font-weight:600;color:var(--text)">Appuyer pour prendre une photo</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px">Utilisez l'appareil photo de votre téléphone</div>
+      </label>
+      <img id="preview-${o.id}" class="photo-preview" src="" alt="Photo de livraison">
+      <div id="photo-ok-${o.id}" style="display:none;margin-top:8px;padding:8px 12px;background:var(--green-light);border-radius:var(--radius);font-size:13px;color:var(--green);font-weight:600"><i class="ti ti-circle-check"></i> Photo enregistrée ✓</div>
+    </div>
+
+    <!-- ACTIONS -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-sm" onclick="alert('Appel en cours...')"><i class="ti ti-phone"></i> Appeler le client</button>
+      <button class="btn btn-sm btn-green" onclick="simPay('${o.id}')"><i class="ti ti-circle-check"></i> Simuler paiement reçu</button>
+    </div>
+  </div>`).join('')}`;
+}
+
+/* Frais mode toggle */
+function setFraisMode(id, mode) {
+  const o = S.orders.find(x=>x.id===id);
+  o.fraisMode = mode;
+  const btnOui = document.getElementById('btn-oui-'+id);
+  const btnNon = document.getElementById('btn-non-'+id);
+  btnOui.className = 'toggle-btn' + (mode==='oui'?' active-oui':'');
+  btnNon.className = 'toggle-btn' + (mode==='non'?' active-non':'');
+  const info = document.getElementById('frais-info-'+id);
+  info.style.display = 'block';
+  if(mode==='oui') {
+    info.innerHTML = '<i class="ti ti-info-circle" style="color:var(--green)"></i> <strong>Les frais seront ajoutés au montant Mobile Money.</strong> Le client paie tout en une seule fois.';
+    info.style.color = 'var(--green)';
+  } else {
+    info.innerHTML = '<i class="ti ti-info-circle" style="color:var(--orange)"></i> <strong>Vous récupérez vos frais en espèces sur place.</strong> Le client ne paie que le produit par Mobile Money.';
+    info.style.color = 'var(--orange)';
+  }
+  recalcTotal(id);
+}
+
+function recalcTotal(id) {
+  const o = S.orders.find(x=>x.id===id);
+  const fraisVal = parseInt(document.getElementById('frais-'+id).value)||0;
+  o.frais = fraisVal;
+  const fraisLine = document.getElementById('frais-line-'+id);
+  const totalLine = document.getElementById('total-line-'+id);
+  if(o.fraisMode==='oui' && fraisVal>0) {
+    const total = o.amount + fraisVal;
+    fraisLine.style.display='block';
+    fraisLine.textContent = `+ Frais livraison : ${fmt(fraisVal)} F`;
+    totalLine.textContent = `TOTAL À PAYER : ${fmt(total)} F CFA`;
+  } else if(o.fraisMode==='non') {
+    fraisLine.style.display='block';
+    fraisLine.innerHTML = `<span style="color:var(--orange)">Frais ${fmt(fraisVal)} F récupérés en espèces sur place</span>`;
+    totalLine.textContent = `TOTAL MOMO : ${fmt(o.amount)} F CFA`;
+  } else {
+    fraisLine.style.display='none';
+    totalLine.textContent='';
+  }
+}
+
+/* Photo */
+function triggerPhoto(id) {
+  document.getElementById('photo-'+id).click();
+}
+function previewPhoto(id, input) {
+  if(!input.files||!input.files[0]) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const img = document.getElementById('preview-'+id);
+    img.src = e.target.result;
+    img.style.display = 'block';
+    document.getElementById('photo-ok-'+id).style.display = 'block';
+    const o = S.orders.find(x=>x.id===id);
+    if(o) o.photoUrl = e.target.result;
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function pgParametres() {
+  return `
+  <div class="page-narrow">
+    <div class="card">
+      <div class="card-title"><i class="ti ti-credit-card"></i> Numéro Mobile Money de réception</div>
+      <div class="banner banner-purple"><i class="ti ti-info-circle"></i> Ce numéro est affiché au livreur pour que le client puisse payer.</div>
+      <div class="form-group"><label class="form-label">Numéro MTN MoMo / Airtel Money</label><input class="input" id="momo-input" value="${S.momoNumber}"></div>
+      <button class="btn btn-primary" onclick="saveMomo()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-building-bank"></i> Agence de retrait pour les livreurs</div>
+      <div class="banner banner-warn"><i class="ti ti-info-circle"></i> Cette information est affichée dans la vue livreur pour qu'il sache où retirer ses frais.</div>
+      <div class="form-group"><label class="form-label">Nom de l'agence / point de retrait</label><input class="input" id="agence-input" value="${S.agenceLivraison}"></div>
+      <button class="btn btn-primary" onclick="saveAgence()"><i class="ti ti-check"></i> Enregistrer</button>
+    </div>
+  </div>`;
+}
+
+/* ══════════════════════════ ACTIONS ══════════════════════════ */
+function saveMomo() {
+  S.momoNumber = document.getElementById('momo-input').value.trim() || S.momoNumber;
+  modal(`<div style="text-align:center;padding:1rem"><div style="font-size:48px;margin-bottom:12px">✅</div><div style="font-size:16px;font-weight:700;margin-bottom:8px">Numéro enregistré</div><div style="color:var(--text2);margin-bottom:16px">${S.momoNumber}</div><button class="btn btn-primary" onclick="closeModal()">Fermer</button></div>`);
+}
+function saveAgence() {
+  S.agenceLivraison = document.getElementById('agence-input').value.trim() || S.agenceLivraison;
+  modal(`<div style="text-align:center;padding:1rem"><div style="font-size:48px;margin-bottom:12px">✅</div><div style="font-size:16px;font-weight:700;margin-bottom:8px">Agence enregistrée</div><div style="color:var(--text2);margin-bottom:16px">${S.agenceLivraison}</div><button class="btn btn-primary" onclick="closeModal()">Fermer</button></div>`);
+}
+
+function submitOrder() {
+  const name  = document.getElementById('c-name').value.trim();
+  const phone = document.getElementById('c-phone').value.trim();
+  const prodId = parseInt(document.getElementById('c-prod').value);
+  const qty   = parseInt(document.getElementById('c-qty').value);
+  const prod  = S.products.find(p=>p.id===prodId);
+  const qtyErr = document.getElementById('qty-error');
+
+  if(!name||!phone){ alert('Renseignez le nom et le téléphone du client.'); return; }
+  if(!qty||qty<1){ qtyErr.style.display='block'; document.getElementById('c-qty').focus(); return; }
+  qtyErr.style.display='none';
+
+  const o = {
+    id:`CMD-0${String(S.orders.length+1).padStart(2,'0')}`,
+    agent:'Jean K.', client:name, phone, product:prod.name, qty,
+    amount: prod.price * qty, status:'en_attente',
+    date:today(), pay:'-', livreur:'-', frais:0, fraisMode:null, photoUrl:null
+  };
+  S.orders.unshift(o);
+  S.agents[0].sales++;
+  modal(`<div style="text-align:center;padding:1rem">
+    <div style="font-size:48px;margin-bottom:12px">✅</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px">Commande envoyée !</div>
+    <div style="color:var(--text2);margin-bottom:6px"><strong>${o.id}</strong> — ${o.qty} × ${prod.name}</div>
+    <div style="font-size:18px;font-weight:800;color:var(--purple);margin-bottom:12px">${fmt(o.amount)} F CFA</div>
+    <div style="color:var(--text2);margin-bottom:16px">Pour <strong>${name}</strong>. L'admin va assigner un livreur.</div>
+    <button class="btn btn-primary" onclick="closeModal();nav('mon_compte')">Voir mon compte</button>
+  </div>`);
+}
+
+function openAssign(id) {
+  modal(`
+  <div class="modal-title">Assigner un livreur <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+  <div class="form-group"><label class="form-label">Commande</label><input class="input" value="${id}" disabled></div>
+  <div class="form-group"><label class="form-label">Livreur</label>
+    <select class="input" id="sel-liv"><option>Paul D.</option><option>Henri M.</option><option>Bernard K.</option></select>
+  </div>
+  <button class="btn btn-primary" style="width:100%" onclick="doAssign('${id}')"><i class="ti ti-check"></i> Confirmer</button>`);
+}
+function doAssign(id) {
+  const o = S.orders.find(x=>x.id===id);
+  if(o){ o.livreur=document.getElementById('sel-liv').value; o.status='en_livraison'; }
+  closeModal(); render();
+}
+
+function simPay(id) {
+  const o = S.orders.find(x=>x.id===id);
+  if(!o.photoUrl) {
+    modal(`<div style="text-align:center;padding:1rem">
+      <div style="font-size:48px;margin-bottom:12px">📷</div>
+      <div style="font-size:16px;font-weight:700;margin-bottom:8px">Photo requise</div>
+      <div style="color:var(--text2);margin-bottom:16px">Veuillez prendre une photo de la livraison avant de confirmer.</div>
+      <button class="btn btn-primary" onclick="closeModal()">OK</button>
+    </div>`);
+    return;
+  }
+  const total = o.fraisMode==='oui' ? o.amount + (o.frais||0) : o.amount;
+  o.status='livré'; o.pay='MTN MoMo';
+  const ag = S.agents.find(a=>a.name===o.agent);
+  if(ag) ag.points++;
+  modal(`<div style="text-align:center;padding:1rem">
+    <div style="font-size:48px;margin-bottom:12px">🎉</div>
+    <div style="font-size:16px;font-weight:700;margin-bottom:8px">Paiement Mobile Money reçu !</div>
+    ${o.photoUrl?`<img src="${o.photoUrl}" style="width:100%;max-height:160px;object-fit:cover;border-radius:var(--radius);margin-bottom:12px" alt="Photo livraison">`:''}
+    <div style="color:var(--text2);margin-bottom:6px">Montant encaissé : <strong style="color:var(--purple)">${fmt(total)} F CFA</strong></div>
+    ${o.fraisMode==='non'?`<div style="color:var(--orange);font-size:13px;margin-bottom:8px">Frais de livraison ${fmt(o.frais)} F à récupérer en espèces</div>`:''}
+    <div style="color:var(--text2);margin-bottom:16px">Livraison confirmée. +1 point crédité à l'agent.</div>
+    <button class="btn btn-primary" onclick="closeModal();render()">Fermer</button>
+  </div>`);
+}
+
+/* CRUD PRODUITS */
+function openAddProd() {
+  modal(`
+  <div class="modal-title">Nouveau produit <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+  <div class="form-row" style="margin-bottom:0">
+    <div class="form-group"><label class="form-label">Nom</label><input class="input" id="np-name" placeholder="Nom du produit"></div>
+    <div class="form-group"><label class="form-label">Emoji</label><input class="input" id="np-emoji" placeholder="🎧"></div>
+  </div>
+  <div class="form-row" style="margin-bottom:0">
+    <div class="form-group"><label class="form-label">Prix (F CFA)</label><input class="input" id="np-price" type="number" placeholder="5000"></div>
+    <div class="form-group"><label class="form-label">Stock</label><input class="input" id="np-stock" type="number" placeholder="10"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Catégorie</label><select class="input" id="np-cat"><option>Électronique</option><option>Accessoires</option><option>Vêtements</option><option>Autre</option></select></div>
+  <div class="form-group"><label class="form-label">Description</label><input class="input" id="np-desc" placeholder="Description courte"></div>
+  <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="saveProd()"><i class="ti ti-plus"></i> Ajouter</button>`);
+}
+function saveProd() {
+  const name=document.getElementById('np-name').value.trim();
+  const price=parseInt(document.getElementById('np-price').value)||0;
+  if(!name||!price){alert('Remplissez le nom et le prix.');return;}
+  S.products.push({id:Date.now(),name,price,stock:parseInt(document.getElementById('np-stock').value)||0,cat:document.getElementById('np-cat').value,emoji:document.getElementById('np-emoji').value||'📦',desc:document.getElementById('np-desc').value});
+  closeModal();render();
+}
+function openEditProd(id) {
+  const p=S.products.find(x=>x.id===id);
+  modal(`
+  <div class="modal-title">Modifier — ${p.name} <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+  <div class="form-group"><label class="form-label">Nom</label><input class="input" id="ep-name" value="${p.name}"></div>
+  <div class="form-row" style="margin-bottom:0">
+    <div class="form-group"><label class="form-label">Prix (F CFA)</label><input class="input" id="ep-price" type="number" value="${p.price}"></div>
+    <div class="form-group"><label class="form-label">Stock</label><input class="input" id="ep-stock" type="number" value="${p.stock}"></div>
+  </div>
+  <div class="form-group"><label class="form-label">Emoji</label><input class="input" id="ep-emoji" value="${p.emoji}"></div>
+  <div class="form-group"><label class="form-label">Description</label><input class="input" id="ep-desc" value="${p.desc}"></div>
+  <button class="btn btn-primary" style="width:100%;margin-top:4px" onclick="saveEditProd(${id})"><i class="ti ti-check"></i> Sauvegarder</button>`);
+}
+function saveEditProd(id) {
+  const p=S.products.find(x=>x.id===id);
+  p.name=document.getElementById('ep-name').value||p.name;
+  p.price=parseInt(document.getElementById('ep-price').value)||p.price;
+  p.stock=parseInt(document.getElementById('ep-stock').value)||p.stock;
+  p.emoji=document.getElementById('ep-emoji').value||p.emoji;
+  p.desc=document.getElementById('ep-desc').value||p.desc;
+  closeModal();render();
+}
+function delProd(id){if(confirm('Supprimer ce produit ?')){S.products=S.products.filter(x=>x.id!==id);render();}}
+function openNewOrder(prodId){nav('nouvelle_commande');if(prodId)setTimeout(()=>{const s=document.getElementById('c-prod');if(s){s.value=prodId;updateQtyMax();}},80);}
+
+/* CRUD AGENTS */
+function openAddAgent() {
+  modal(`
+  <div class="modal-title">Nouvel agent <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+  <div class="form-group"><label class="form-label">Nom complet</label><input class="input" id="ag-name" placeholder="Prénom Nom"></div>
+  <div class="form-group"><label class="form-label">Email</label><input class="input" id="ag-email" placeholder="agent@shop.com"></div>
+  <button class="btn btn-primary" style="width:100%" onclick="saveAgent()"><i class="ti ti-user-plus"></i> Créer le compte</button>`);
+}
+function saveAgent(){const name=document.getElementById('ag-name').value.trim();if(!name){alert('Entrez le nom.');return;}S.agents.push({id:Date.now(),name,email:document.getElementById('ag-email').value,points:0,sales:0,status:'actif'});closeModal();render();}
+function openAgentDetail(id){
+  const a=S.agents.find(x=>x.id===id);
+  const cmds=S.orders.filter(o=>o.agent===a.name);
+  modal(`
+  <div class="modal-title">${a.name} <button class="close-btn" onclick="closeModal()"><i class="ti ti-x"></i></button></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+    <div class="metric" style="text-align:center"><div style="font-size:36px;font-weight:800;color:var(--purple)">${a.points}</div><div class="metric-label" style="justify-content:center">Points</div></div>
+    <div class="metric" style="text-align:center"><div style="font-size:32px;font-weight:800">${a.sales}</div><div class="metric-label" style="justify-content:center">Ventes</div></div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>ID</th><th>Produit</th><th>Qté</th><th>Total</th><th>Statut</th></tr></thead>
+    <tbody>${cmds.map(o=>`<tr><td style="font-family:monospace;font-size:11px">${o.id}</td><td>${o.product}</td><td style="text-align:center">${o.qty}</td><td>${fmt(o.amount)} F</td><td>${sbadge(o.status)}</td></tr>`).join('')}</tbody>
+  </table></div>`);
+}
+
+switchRole('admin');
+</script>
+</body>
+</html>
